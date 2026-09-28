@@ -165,7 +165,8 @@ function sheet(h,tap){closeSheet();const d=document.createElement("div");d.class
 function closeSheet(){document.querySelector(".scrim")?.remove()}
 addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
 function toast(m){document.querySelector(".toast")?.remove();const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),2600)}
-go("delayed");
+const qs=new URLSearchParams(location.search).get("state");
+go(qs&&S[qs]?qs:"delayed");
 </script>
 </body>
 </html>
