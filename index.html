@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Order Tracking</title>
+<style>
+:root{--bg:#f4f5f9;--card:#fff;--ink:#14162b;--mute:#6b6f85;--line:#e5e7f0;--brand:#4f46e5;--brand-soft:#eceaff;--ok:#12a150;--ok-soft:#e3f6ec;--warn:#c76b00;--warn-soft:#fff1de;--bad:#d92d3f;--bad-soft:#fde8ea;--info:#2563eb;--info-soft:#e6efff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0e18;--card:#181a2a;--ink:#f1f2fa;--mute:#9a9eb8;--line:#2a2d44;--brand:#8b85ff;--brand-soft:#26244a;--ok:#3ddc84;--ok-soft:#12301f;--warn:#ffb454;--warn-soft:#38270f;--bad:#ff6b7a;--bad-soft:#3a1519;--info:#6ea2ff;--info-soft:#15264a}}
+:root[data-theme="dark"]{--bg:#0d0e18;--card:#181a2a;--ink:#f1f2fa;--mute:#9a9eb8;--line:#2a2d44;--brand:#8b85ff;--brand-soft:#26244a;--ok:#3ddc84;--ok-soft:#12301f;--warn:#ffb454;--warn-soft:#38270f;--bad:#ff6b7a;--bad-soft:#3a1519;--info:#6ea2ff;--info-soft:#15264a}
+*{box-sizing:border-box;margin:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.app{max-width:430px;min-width:320px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:32px}
+.demo{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 16px 8px;border-bottom:1px solid var(--line)}
+.demo small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{padding:8px 2px;border-radius:9px;font-size:12px;font-weight:600;color:var(--mute);line-height:1.2}
+.seg button[aria-pressed=true]{background:var(--brand);color:#fff}
+header.bar{display:flex;align-items:center;gap:12px;padding:16px}
+.icon-btn{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;flex:none}
+.bar h1{font-size:18px;line-height:1.2}
+.bar p{font-size:12.5px;color:var(--mute)}
+main{padding:0 16px;display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.hero{display:grid;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;width:max-content}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.info{background:var(--info-soft);color:var(--info)}
+.hero h2{font-size:22px;line-height:1.2}
+.eta{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:12px}
+.eta b{display:block;font-size:16px}.eta span{font-size:12px;color:var(--mute)}
+.eta s{color:var(--mute)}
+.alert{display:flex;gap:10px;border-radius:14px;padding:12px 14px;font-size:14px}
+.alert.warn{background:var(--warn-soft);color:var(--warn)}.alert.bad{background:var(--bad-soft);color:var(--bad)}.alert.info{background:var(--info-soft);color:var(--info)}
+.alert p{color:var(--ink)}.alert strong{display:block;margin-bottom:2px}
+.actions{display:grid;gap:8px}
+.btn{min-height:48px;border-radius:14px;font-weight:700;padding:0 16px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn.pri{background:var(--brand);color:#fff}.btn.sec{background:var(--card);border:1px solid var(--line)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+h3{font-size:14px;margin-bottom:12px}
+.tl{list-style:none;padding:0}
+.tl li{display:grid;grid-template-columns:28px 1fr auto;gap:12px;position:relative;padding-bottom:18px}
+.tl li:last-child{padding-bottom:0}
+.tl li:not(:last-child)::before{content:"";position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--line)}
+.tl li.done:not(:last-child)::before{background:var(--ok)}
+.dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--bg);border:2px solid var(--line);color:var(--mute);font-size:13px;z-index:1}
+.done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.current .dot{border-color:var(--brand);background:var(--brand-soft);color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
+.issue .dot{background:var(--bad);border-color:var(--bad);color:#fff}
+.late .dot{border-color:var(--warn);background:var(--warn-soft);color:var(--warn);box-shadow:0 0 0 4px var(--warn-soft)}
+.tl b{display:block;font-size:14.5px}.tl .pending b{color:var(--mute);font-weight:600}
+.tl small{color:var(--mute);font-size:12.5px}
+.tl time{font-size:12px;color:var(--mute);white-space:nowrap;padding-top:2px}
+.kv{display:grid;gap:10px}
+.kv div{display:flex;justify-content:space-between;gap:12px;font-size:14px}.kv span{color:var(--mute)}.kv b{text-align:right;font-weight:600}
+.item{display:flex;gap:12px;align-items:center}
+.thumb{width:52px;height:52px;border-radius:12px;background:var(--brand-soft);display:grid;place-items:center;font-size:26px;flex:none}
+.item b{display:block;font-size:14.5px}.item small{color:var(--mute)}
+.link{color:var(--brand);font-weight:700;font-size:14px;margin-top:12px;display:inline-block}
+.sk{background:linear-gradient(90deg,var(--line),var(--bg),var(--line));background-size:200% 100%;animation:sh 1.2s infinite;border-radius:12px}
+@keyframes sh{to{background-position:-200% 0}}
+.scrim{position:fixed;inset:0;background:rgba(10,10,25,.5);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fd .2s}
+.sheet{background:var(--card);width:100%;max-width:430px;border-radius:22px 22px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow:auto;animation:up .25s ease}
+.grab{width:40px;height:4px;border-radius:9px;background:var(--line);margin:0 auto 14px}
+.sheet h2{font-size:18px;margin-bottom:4px}.sheet>p{color:var(--mute);font-size:13.5px;margin-bottom:14px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px}
+.opt[aria-checked=true]{border-color:var(--brand);background:var(--brand-soft)}
+.opt i{font-style:normal;font-size:20px}.opt small{display:block;color:var(--mute)}
+textarea{width:100%;min-height:76px;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg);color:var(--ink);font:inherit;margin:4px 0 12px;resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:14px;z-index:30;animation:fd .2s;max-width:90%}
+.sw{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sw button{width:48px;height:28px;border-radius:99px;background:var(--line);position:relative;flex:none}
+.sw button::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.sw button[aria-checked=true]{background:var(--ok)}.sw button[aria-checked=true]::after{left:23px}
+@keyframes fd{from{opacity:0}}@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="demo"><small>Demo scenario</small>
+    <div class="seg" id="seg" role="group" aria-label="Demo scenario"></div></div>
+  <header class="bar">
+    <button class="icon-btn" aria-label="Go back" onclick="toast('Back to My Orders')">‹</button>
+    <div><h1>Track order</h1><p>Order #NV-482915</p></div>
+  </header>
+  <main id="view" aria-live="polite"></main>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const ITEMS=[{e:"🎧",n:"Nova Wireless Headphones",m:"Midnight Black · Qty 1",p:129},{e:"🔌",n:"USB-C Fast Charger 65W",m:"White · Qty 1",p:29}];
+const STEPS=["Order placed","Processing","Shipped","Out for delivery","Delivered"];
+const S={
+ ontime:{label:"On time",pill:["info","🚚 Out for delivery"],title:"Arriving today",cur:3,
+  eta:["Estimated delivery","Today, Sep 28","by 6:00 PM"],
+  t:["Sep 21","Sep 22","Sep 25","8:40 AM",""],sub:["Payment confirmed","Packed at Chattogram hub","Left origin facility","Rider Rahim is nearby",""],
+  cta:["Contact courier","call"]},
+ delayed:{label:"Delayed",pill:["warn","⏳ Delayed"],title:"Your order is running late",cur:2,late:1,
+  eta:["New estimate","Oct 1","was Sep 26"],
+  t:["Sep 21","Sep 22","Sep 23","",""],sub:["Payment confirmed","Packed at Chattogram hub","Stuck at sorting hub — high volume","Pending",""],
+  alert:["warn","⚠️","We're sorry, this is late","Your package missed its Sep 26 estimate because of hub congestion. It's moving again and should arrive by Oct 1."],
+  cta:["Contact support","support"],cta2:["Notify me on updates","notify"]},
+ notrecv:{label:"Not received",pill:["bad","📦 Marked delivered"],title:"Delivered, but not with you?",cur:4,issue:4,
+  eta:["Marked delivered","Sep 27, 2:14 PM","Left at front door"],
+  t:["Sep 21","Sep 22","Sep 24","Sep 27","Sep 27"],sub:["Payment confirmed","Packed at Chattogram hub","Left origin facility","Rider Rahim","Delivery status disputed"],
+  alert:["bad","🔍","Didn't get it?","Check with neighbours, building reception and around your entrance. If it's still missing, tell us and we'll investigate with the courier."],
+  cta:["I didn't receive it","report"],cta2:["I found it — close","found"]},
+ notrack:{label:"No tracking",pill:["info","🕐 Preparing"],title:"Tracking is on its way",cur:1,none:1,
+  eta:["Estimated delivery","Oct 2 – Oct 4","not final yet"],
+  t:["Today","In progress","","",""],sub:["Payment confirmed","Being packed by seller","","",""],
+  alert:["info","ℹ️","Tracking not available yet","A tracking number is generated once the courier collects your parcel, usually within 24 hours. We'll notify you the moment it's live."],
+  cta:["Notify me when tracking is ready","notify"],cta2:["Contact support","support"]}
+};
+let cur="delayed",notify=false;
+$("#seg").innerHTML=Object.entries(S).map(([k,v])=>`<button data-k="${k}" aria-pressed="false">${v.label}</button>`).join("");
+$("#seg").onclick=e=>{const k=e.target.dataset.k;if(k)go(k)};
+function go(k){cur=k;document.querySelectorAll("#seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===k));
+ $("#view").innerHTML=`<div class="sk" style="height:190px"></div><div class="sk" style="height:60px"></div><div class="sk" style="height:280px"></div><div class="sk" style="height:110px"></div>`;
+ setTimeout(render,650)}
+function render(){const s=S[cur];const total=ITEMS.reduce((a,b)=>a+b.p,0);
+ const tl=STEPS.map((n,i)=>{let c="pending",ic=i+1;
+  if(i<s.cur)c="done",ic="✓";
+  if(i===s.cur)c=s.issue===i?"issue":s.late&&i===2?"late":s.none?"current":(cur==="ontime"?"current":"current");
+  if(i===s.cur&&i===4&&!s.issue)c="done",ic="✓";
+  if(s.issue===i)ic="!";if(c==="late")ic="⏳";
+  return `<li class="${c}"><span class="dot">${ic}</span><div><b>${n}</b><small>${s.sub[i]||(c==="pending"?"Upcoming":"")}</small></div><time>${s.t[i]}</time></li>`}).join("");
+ const a=s.alert?`<div class="alert ${s.alert[0]}" role="alert"><span>${s.alert[1]}</span><p><strong>${s.alert[2]}</strong>${s.alert[3]}</p></div>`:"";
+ const eta=`<div class="eta"><div><span>${s.eta[0]}</span><b>${s.eta[1]}</b></div><span>${s.late?`<s>${s.eta[2]}</s>`:s.eta[2]}</span></div>`;
+ const c2=s.cta2?`<button class="btn sec" data-a="${s.cta2[1]}">${s.cta2[0]}</button>`:`<button class="btn sec" data-a="support">Contact support</button>`;
+ $("#view").innerHTML=`
+ <section class="card hero"><span class="pill ${s.pill[0]}">${s.pill[1]}</span><h2>${s.title}</h2>${eta}</section>
+ ${a}
+ <section class="actions"><button class="btn pri" data-a="${s.cta[1]}">${s.cta[0]}</button>${c2}
+  ${cur!=="notrecv"&&cur!=="notrack"?`<button class="btn sec" data-a="report">Report a delivery issue</button>`:""}</section>
+ <section class="card"><h3>Delivery progress</h3><ol class="tl">${tl}</ol></section>
+ <section class="card"><h3>Delivery details</h3><div class="kv"><div><span>Courier</span><b>${s.none?"Not assigned yet":"SwiftPath Express"}</b></div><div><span>Tracking no.</span><b>${s.none?"Pending":"SP-9081-2274-BD"}</b></div><div><span>Address</span><b>House 12, Road 4, GEC Circle,<br>Chattogram</b></div></div></section>
+ <section class="card"><h3>Order summary</h3>${ITEMS.map(i=>`<div class="item" style="margin-bottom:10px"><span class="thumb">${i.e}</span><div><b>${i.n}</b><small>${i.m}</small></div></div>`).join("")}
+  <div class="kv" style="border-top:1px solid var(--line);padding-top:12px"><div><span>Total paid</span><b>$${total+8}.00</b></div></div>
+  <button class="link" data-a="details">View order details →</button></section>`}
+$("#view").onclick=e=>{const a=e.target.closest("[data-a]")?.dataset.a;if(a)act(a)};
+function act(a){
+ if(a==="details")sheet(`<h2>Order details</h2><p>Placed Sep 21, 2026 · Paid with card ending 4417</p>
+  ${ITEMS.map(i=>`<div class="item" style="margin-bottom:12px"><span class="thumb">${i.e}</span><div><b>${i.n}</b><small>${i.m}</small></div><b style="margin-left:auto">$${i.p}</b></div>`).join("")}
+  <div class="kv" style="border-top:1px solid var(--line);padding-top:12px"><div><span>Subtotal</span><b>$${ITEMS.reduce((a,b)=>a+b.p,0)}.00</b></div><div><span>Shipping</span><b>$8.00</b></div><div><span>Total</span><b>$166.00</b></div></div>`);
+ else if(a==="support"||a==="call")sheet(`<h2>Contact support</h2><p>We usually reply within 5 minutes.</p>
+  <button class="opt" data-t="Opening live chat…"><i>💬</i><div><b>Live chat</b><small>Fastest · Avg. wait 2 min</small></div></button>
+  <button class="opt" data-t="Calling support…"><i>📞</i><div><b>Call us</b><small>9 AM – 9 PM daily</small></div></button>
+  <button class="opt" data-t="Email draft opened"><i>✉️</i><div><b>Email</b><small>support@example.com</small></div></button>`,1);
+ else if(a==="report")report();
+ else if(a==="notify"){notify=!notify;sheet(`<h2>Notifications</h2><p>Get a push alert when the status changes.</p><div class="sw card"><b>Notify me about this order</b><button role="switch" aria-checked="${notify}" aria-label="Toggle notifications" id="sw"></button></div>`);
+  $("#sw").onclick=e=>{notify=!notify;e.target.setAttribute("aria-checked",notify)}}
+ else if(a==="found")toast("Great! Glad it arrived. Order closed.")}
+let pick=0;
+function report(){const o=["Package not received","Package damaged","Wrong item delivered","Delivery is very late"];pick=cur==="notrecv"?0:cur==="delayed"?3:0;
+ sheet(`<h2>Report a delivery issue</h2><p>Tell us what went wrong and we'll follow up within 24 hours.</p>
+ ${o.map((t,i)=>`<button class="opt" role="radio" aria-checked="${i===pick}" data-i="${i}">${t}</button>`).join("")}
+ <textarea placeholder="Add details (optional)" aria-label="Details"></textarea><button class="btn pri" id="sub">Submit report</button>`);
+ document.querySelectorAll(".opt[role=radio]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".opt[role=radio]").forEach(x=>x.setAttribute("aria-checked",x===b))});
+ $("#sub").onclick=()=>{closeSheet();toast("Report submitted. Ref #RP-20931")}}
+function sheet(h,tap){closeSheet();const d=document.createElement("div");d.className="scrim";d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${h}<button class="btn sec" style="margin-top:6px" id="cl">Close</button></div>`;
+ d.onclick=e=>{if(e.target===d)closeSheet()};document.body.append(d);$("#cl").onclick=closeSheet;
+ if(tap)d.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{closeSheet();toast(b.dataset.t)})}
+function closeSheet(){document.querySelector(".scrim")?.remove()}
+addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet()});
+function toast(m){document.querySelector(".toast")?.remove();const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),2600)}
+go("delayed");
+</script>
+</body>
+</html>
